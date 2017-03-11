@@ -170,6 +170,9 @@ try {
             exit(10);
         }
     }
+    # если в conf.d/ssl пусто
+    
+    
 } catch (Exception $ex) {
     echo 'Error: ', $ex->getMessage(), "\n";
 }
