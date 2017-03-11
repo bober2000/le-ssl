@@ -108,6 +108,7 @@ try {
         }
     } else {
         $result = array_diff($dlist, $dcustomlist);
+        var_dump($result);
         foreach ($result as $domain) {
             try {
                 $cmd = escapeshellcmd('/usr/bin/php le-ssl-add.php -n ' . $domain);
