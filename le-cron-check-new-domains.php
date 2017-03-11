@@ -56,56 +56,6 @@ try {
                 exit(6);
             }
         }
-        // Check if domain deleted but config for nginx exists
-        $result = array_diff($dssllist, $dlist);
-        foreach ($result as $domain) {
-            try {
-                $file = current_ssl_domain_list . $domain . '.conf';
-                if (!(is_file($file) && @unlink($file))) {
-                    throw new Exception("Can't delete" . $file, 7);
-                }
-            } catch (Exception $ex) {
-                echo 'Error: ', $ex->getMessage(), "\n";
-                exit(7);
-            }
-            // Delete Certificate from acme.sh too
-            try {
-                $cmd = escapeshellcmd("rm -rf " . acmesh_home . $domain);
-                $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-                if ($return_val <> 0)
-                    throw new \Exception("Can't remove domain" . $domain . " dir in acme.sh home", 8);
-            } catch (Exception $ex) {
-                echo 'Error: ', $ex->getMessage(), "\n";
-                exit(8);
-            }
-        }
-        try {
-            $cmd = escapeshellcmd('service nginx reload');
-            $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-            if ($return_val <> 0)
-                throw new \Exception("Can't reload nginx", 9);
-        } catch (Exception $ex) {
-            echo 'Error: ', $ex->getMessage(), "\n";
-            exit(9);
-        }
-        try {
-            $cmd = escapeshellcmd("rm -rf /usr/share/ssl/certs/" . $domain . ".crt");
-            $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-            if ($return_val <> 0)
-                throw new \Exception("Can't remove domain" . $domain . " certificate /usr/share/ssl/certs/" . $domain . ".crt", 10);
-        } catch (Exception $ex) {
-            echo 'Error: ', $ex->getMessage(), "\n";
-            exit(10);
-        }
-        try {
-            $cmd = escapeshellcmd("rm -rf /usr/share/ssl/private/" . $domain . ".key");
-            $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-            if ($return_val <> 0)
-                throw new \Exception("Can't remove domain" . $domain . " key /usr/share/ssl/private/" . $domain . ".crt", 10);
-        } catch (Exception $ex) {
-            echo 'Error: ', $ex->getMessage(), "\n";
-            exit(10);
-        }
     } else {
         $result = array_diff($dlist, $dcustomlist);
         var_dump($result);
@@ -120,60 +70,57 @@ try {
                 exit(6);
             }
         }
-        // Check if domain deleted but config for nginx exists
-        $result = array_diff($dssllist, $dlist);
-        foreach ($result as $domain) {
-            try {
-                $file = current_ssl_domain_list . $domain . '.conf';
-                if (!(is_file($file) && @unlink($file))) {
-                    throw new Exception("Can't delete" . $file, 7);
-                }
-            } catch (Exception $ex) {
-                echo 'Error: ', $ex->getMessage(), "\n";
-                exit(7);
+    }
+    // Check if domain deleted but config for nginx exists
+    $result = array_diff($dssllist, $dlist);
+    foreach ($result as $domain) {
+        try {
+            $file = current_ssl_domain_list . $domain . '.conf';
+            if (!(is_file($file) && @unlink($file))) {
+                throw new Exception("Can't delete" . $file, 7);
             }
-            // Delete Certificate from acme.sh too
-            try {
-                $cmd = escapeshellcmd("rm -rf " . acmesh_home . $domain);
-                $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-                if ($return_val <> 0)
-                    throw new \Exception("Can't remove domain" . $domain . " dir in acme.sh home", 8);
-            } catch (Exception $ex) {
-                echo 'Error: ', $ex->getMessage(), "\n";
-                exit(8);
-            }
-        }
-        try {
-            $cmd = escapeshellcmd('service nginx reload');
-            $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-            if ($return_val <> 0)
-                throw new \Exception("Can't reload nginx", 9);
         } catch (Exception $ex) {
             echo 'Error: ', $ex->getMessage(), "\n";
-            exit(9);
+            exit(7);
         }
+        // Delete Certificate from acme.sh too
         try {
-            $cmd = escapeshellcmd("rm -rf /usr/share/ssl/certs/" . $domain . ".crt");
+            $cmd = escapeshellcmd("rm -rf " . acmesh_home . $domain);
             $gid = exec($cmd . " 2>&1", $aResult, $return_val);
             if ($return_val <> 0)
-                throw new \Exception("Can't remove domain" . $domain . " certificate /usr/share/ssl/certs/" . $domain . ".crt", 10);
+                throw new \Exception("Can't remove domain" . $domain . " dir in acme.sh home", 8);
         } catch (Exception $ex) {
             echo 'Error: ', $ex->getMessage(), "\n";
-            exit(10);
-        }
-        try {
-            $cmd = escapeshellcmd("rm -rf /usr/share/ssl/private/" . $domain . ".key");
-            $gid = exec($cmd . " 2>&1", $aResult, $return_val);
-            if ($return_val <> 0)
-                throw new \Exception("Can't remove domain" . $domain . " key /usr/share/ssl/private/" . $domain . ".crt", 10);
-        } catch (Exception $ex) {
-            echo 'Error: ', $ex->getMessage(), "\n";
-            exit(10);
+            exit(8);
         }
     }
-    # если в conf.d/ssl пусто
-    
-    
+    try {
+        $cmd = escapeshellcmd('service nginx reload');
+        $gid = exec($cmd . " 2>&1", $aResult, $return_val);
+        if ($return_val <> 0)
+            throw new \Exception("Can't reload nginx", 9);
+    } catch (Exception $ex) {
+        echo 'Error: ', $ex->getMessage(), "\n";
+        exit(9);
+    }
+    try {
+        $cmd = escapeshellcmd("rm -rf /usr/share/ssl/certs/" . $domain . ".crt");
+        $gid = exec($cmd . " 2>&1", $aResult, $return_val);
+        if ($return_val <> 0)
+            throw new \Exception("Can't remove domain" . $domain . " certificate /usr/share/ssl/certs/" . $domain . ".crt", 10);
+    } catch (Exception $ex) {
+        echo 'Error: ', $ex->getMessage(), "\n";
+        exit(10);
+    }
+    try {
+        $cmd = escapeshellcmd("rm -rf /usr/share/ssl/private/" . $domain . ".key");
+        $gid = exec($cmd . " 2>&1", $aResult, $return_val);
+        if ($return_val <> 0)
+            throw new \Exception("Can't remove domain" . $domain . " key /usr/share/ssl/private/" . $domain . ".crt", 10);
+    } catch (Exception $ex) {
+        echo 'Error: ', $ex->getMessage(), "\n";
+        exit(10);
+    }
 } catch (Exception $ex) {
     echo 'Error: ', $ex->getMessage(), "\n";
 }
