@@ -1,0 +1,20 @@
+{
+"config":
+    {
+        "secure-http": false
+    },
+"repositories": [
+        {
+            "type": "pear",
+            "url": "https://pear2.php.net"
+        }
+    ],
+    "require": {
+        "pear-pear2.php.net/PEAR2_Console_CommandLine":"*",
+        "pear-pear2.php.net/PEAR2_Exception":"*"
+    },
+    "require-dev": {
+        "simpletest/simpletest": "^1.1"
+    }
+}
+

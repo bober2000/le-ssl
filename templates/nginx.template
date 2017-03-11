@@ -1,0 +1,33 @@
+server {
+        listen       443 ssl;
+        server_name  %%domain%% www.%%domain%%;
+
+        keepalive_timeout 75 75;
+        ssl_certificate     /usr/share/ssl/certs/%%domain%%.crt;
+        ssl_certificate_key /usr/share/ssl/private/%%domain%%.key;
+
+        include     conf.d/server/*.conf;
+
+        location ~ /\.(svn|git|ht) { deny all; }
+
+        location / {
+          limit_conn                 conn_from_one_ip 20;
+          proxy_pass                 http://$server_addr:80;
+          proxy_connect_timeout      15m;
+          proxy_send_timeout         15m;
+          proxy_read_timeout         15m;
+          proxy_set_header  Host       $host;
+          proxy_set_header X-Real-IP  $remote_addr;
+          proxy_set_header HTTP_X_FORWARDED_FOR  $remote_addr;
+          proxy_set_header X-SSL on;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Range "";
+          proxy_buffers 8 16k;
+          proxy_buffer_size 32k;
+
+          include     conf.d/location/*.conf;
+
+
+          }
+}
+
